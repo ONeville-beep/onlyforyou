@@ -265,7 +265,7 @@
                     <div class="polaroid-frame transform rotate-[-2deg] active:rotate-0 active:scale-100 transition-transform duration-500">
                         <div class="tape opacity-80"></div>
                         <img src="gambar s1.jpeg" alt="Brenda 1">
-                        <p class="caption font-serif italic text-center mt-4 text-zinc-900 text-lg">"Small moments."</p>
+                        <p class="caption font-serif italic text-center mt-4 text-zinc-900 text-lg">"small moments."</p>
                     </div>
                 </div>
 
@@ -273,7 +273,7 @@
                     <div class="polaroid-frame transform rotate-[1.5deg] active:rotate-0 active:scale-100 transition-transform duration-500">
                         <div class="tape opacity-60" style="transform: translateX(-50%) rotate(-5deg);"></div>
                         <img src="gambar d1.jpeg" alt="Brenda 2">
-                        <p class="caption font-serif italic text-center mt-4 text-zinc-900 text-lg">"Your favorite color."</p>
+                        <p class="caption font-serif italic text-center mt-4 text-zinc-900 text-lg">"first time."</p>
                     </div>
                 </div>
 
@@ -281,7 +281,7 @@
                     <div class="polaroid-frame transform rotate-[-1deg] active:rotate-0 active:scale-100 transition-transform duration-500">
                         <div class="tape opacity-90" style="top:-15px"></div>
                         <img src="gambar d2.jpeg" alt="Brenda 3">
-                        <p class="caption font-serif italic text-center mt-4 text-zinc-900 text-lg">"Lately."</p>
+                        <p class="caption font-serif italic text-center mt-4 text-zinc-900 text-lg">"recently."</p>
                     </div>
                 </div>
 
@@ -329,6 +329,13 @@
     <!-- Background Particles Container -->
     <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
 
+    <!-- AUDIO ELEMENT -->
+    <!-- GANTI BAGIAN INI SAMA FILE LAGU KAMU -->
+    <!-- Contoh: <source src="lagu-romantis.mp3" type="audio/mpeg"> -->
+    <audio id="bg-music" loop>
+        <source src="The 1975 - When We Are Together.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         const overlay = document.getElementById('intro-overlay');
         const mainContent = document.getElementById('main-content');
@@ -339,6 +346,9 @@
         const progressFill = document.getElementById('progress-fill');
         const currentTimeEl = document.getElementById('current-time');
         const statusIndicator = document.getElementById('status-indicator');
+        
+        // AMBIL ELEMENT AUDIO
+        const audio = document.getElementById('bg-music');
 
         // Simulation Variables
         let isPlaying = false;
@@ -346,20 +356,42 @@
         let currentTime = 0;
         const duration = 217; // 3:37
 
+        // LIRIK YANG SUDAH DISINKRONISASI
         const lyrics = [
-            { time: 1, text: "..." },
-            { time: 5, text: "Our first kiss was Christmas..." },
-            { time: 10, text: "In the Walmart toy department" },
-            { time: 16, text: "She said, 'I should take you with me'" },
-            { time: 22, text: "'When I leave'" },
-            { time: 28, text: "We were making out" },
-            { time: 34, text: "On the radiator..." },
-            { time: 40, text: "The only time I feel I might get better" },
-            { time: 46, text: "Is when we are together" },
-            { time: 54, text: "I know a place..." },
-            { time: 60, text: "Where we can go." },
-            { time: 65, text: "The only time I feel I might get better" },
-            { time: 72, text: "Is when we are together" }
+            { time: 0, text: "..." },
+            { time: 13, text: "Our first kiss was Christmas in the Walmart toy department" },
+            { time: 19, text: "She said, \"I should take you with me when I leave\"" },
+            { time: 26, text: "We were making out on the radiator in the corner" },
+            { time: 32, text: "But she could hardly wait to get me home" },
+            { time: 39, text: "She said, \"I'm really gonna miss you...\"" },
+            { time: 42, text: "\"...but I'm never gonna call you\"" },
+            { time: 45, text: "\"You're the only person here that makes me cry\"" },
+            { time: 52, text: "Then I cried." },
+            { time: 54, text: "I like to see how things turn out" },
+            { time: 58, text: "If you don't speak, then you won't doubt" },
+            { time: 61, text: "The only time I feel I might get better" },
+            { time: 68, text: "Is when we are together" },
+            { time: 74, text: "I like to see how things turn out" },
+            { time: 77, text: "If you don't speak, then you won't doubt" },
+            { time: 80, text: "The only time I feel I might get better" },
+            { time: 88, text: "Is when we are together" },
+            { time: 94, text: "..." },
+            { time: 106, text: "\"I'm better at writing\" was just a way to get you biting" },
+            { time: 112, text: "Oh, the truth is that our egos are absurd" },
+            { time: 119, text: "I thought we were fighting, but it seems I was gaslighting" },
+            { time: 125, text: "You didn't know that it had its own word" },
+            { time: 132, text: "You still subscribe to this world..." },
+            { time: 136, text: "I still subscribe to this world..." },
+            { time: 139, text: "The only time I feel I might get better" },
+            { time: 146, text: "Is when we are together" },
+            { time: 153, text: "I like to see how things turn out" },
+            { time: 156, text: "If you don't speak, then you won't doubt" },
+            { time: 159, text: "The only time I feel I might get better" },
+            { time: 165, text: "Is when we are together" },
+            { time: 173, text: "..." }, 
+            { time: 193, text: "It was central park..." }, 
+            { time: 196, text: "It was small..." },
+            { time: 200, text: "It was cows..." } 
         ];
 
         function startExperience() {
@@ -369,9 +401,8 @@
                 mainContent.style.opacity = '1';
                 handleScroll();
                 
-                // Auto start on mobile might be blocked by browser policy without interaction, 
-                // but we triggered this via button click so it's fine.
-                setTimeout(toggleSimulation, 500);
+                // Audio tidak akan otomatis jalan di HP karena kebijakan browser (harus di klik user dulu)
+                // Jadi user harus klik tombol Play di player music
             }, 1000);
         }
 
@@ -379,6 +410,9 @@
             isPlaying = !isPlaying;
             
             if (isPlaying) {
+                // PLAY AUDIO
+                audio.play();
+
                 playIcon.innerHTML = ""; 
                 playBtn.classList.add('opacity-0'); 
                 playBtn.classList.add('hover:opacity-100');
@@ -395,6 +429,9 @@
                 }, 1000);
                 
             } else {
+                // PAUSE AUDIO
+                audio.pause();
+
                 playIcon.innerHTML = "▶";
                 playBtn.classList.remove('opacity-0');
                 albumArt.classList.add('paused-spin');
