@@ -2,13 +2,12 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>A Brief Inquiry: Brenda</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* The 1975 aesthetic */
             --rose-primary: #fb7185; 
             --brenda-yellow: #fbbf24; 
             --bg-dark: #050505;
@@ -18,7 +17,8 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-dark);
             color: #fafafa;
-            overflow: hidden;
+            overflow: hidden; /* Prevent body scroll, handle inside main-content */
+            overscroll-behavior: none; /* Prevent rubber-banding on mobile */
         }
 
         .font-serif { font-family: 'Instrument Serif', serif; }
@@ -57,6 +57,7 @@
             align-items: center;
             justify-content: center;
             transition: opacity 1.2s ease, visibility 1.2s;
+            padding: 1rem;
         }
 
         /* Scroll Animations */
@@ -67,38 +68,39 @@
         }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--rose-primary); }
+        /* Hide Scrollbar for clean mobile look but allow scroll */
+        #main-content::-webkit-scrollbar { width: 4px; }
+        #main-content::-webkit-scrollbar-track { background: #0a0a0a; }
+        #main-content::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
         /* Polaroid Aesthetic */
         .polaroid-frame {
             background: #ffffff;
-            padding: 0.8rem 0.8rem 3.5rem 0.8rem;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            padding: 0.6rem 0.6rem 2.5rem 0.6rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             cursor: pointer;
+            margin: 0 auto;
+            max-width: 280px; /* Mobile safe width */
         }
         .polaroid-frame:hover {
-            transform: scale(1.05) rotate(0deg) !important;
+            transform: scale(1.02) rotate(0deg) !important;
             z-index: 50;
         }
         
         .tape {
             position: absolute;
-            top: -15px; left: 50%;
+            top: -12px; left: 50%;
             transform: translateX(-50%);
-            width: 90px; height: 30px;
+            width: 80px; height: 25px;
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(4px);
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .polaroid-frame img {
-            width: 100%; height: 320px;
+            width: 100%; height: 280px;
             object-fit: cover;
             filter: grayscale(0.8) contrast(1.1);
             transition: filter 0.5s ease;
@@ -107,38 +109,12 @@
             filter: grayscale(0) contrast(1);
         }
 
-        .caption {
-            font-family: 'Instrument Serif', serif;
-            color: #111;
-            font-style: italic;
-            margin-top: 1rem;
-            text-align: center;
-            font-size: 1.3rem;
-        }
+        /* Vinyl Animation */
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spinning { animation: spin 8s linear infinite; }
+        .paused-spin { animation-play-state: paused; }
 
-        /* Music Player Styles */
-        #lyric-display {
-            text-shadow: 0 0 15px rgba(251, 113, 133, 0.6);
-            min-height: 4rem;
-            transition: all 0.5s ease;
-        }
-
-        .progress-container {
-            cursor: pointer;
-            height: 10px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .progress-bar-bg {
-            height: 2px;
-            width: 100%;
-            background: rgba(255,255,255,0.1);
-            position: relative;
-            overflow: hidden;
-            border-radius: 99px;
-        }
-
+        /* Progress Bar */
         .progress-fill {
             height: 100%;
             background: var(--rose-primary);
@@ -147,12 +123,7 @@
             box-shadow: 0 0 10px var(--rose-primary);
         }
 
-        /* Vinyl Animation */
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .spinning { animation: spin 8s linear infinite; }
-        .paused-spin { animation-play-state: paused; }
-
-        /* Floating Particles (Dust) */
+        /* Particles */
         .particle {
             position: absolute;
             background: rgba(255, 255, 255, 0.5);
@@ -165,21 +136,22 @@
             50% { opacity: 0.5; }
             100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
         }
+
+        /* Mobile Adjustments for viewport height */
+        .h-dvh { height: 100vh; height: 100dvh; }
     </style>
 </head>
 <body class="grain">
 
     <!-- Intro Landing Page -->
     <div id="intro-overlay">
-        <div class="text-center relative z-10 px-6">
-            <!-- Changed text here as requested -->
-            <p class="text-[10px] uppercase tracking-[0.6em] text-zinc-500 mb-8 animate-pulse">Only For You</p>
+        <div class="text-center relative z-10 px-4 w-full max-w-sm mx-auto">
+            <p class="text-[9px] uppercase tracking-[0.6em] text-zinc-500 mb-8 animate-pulse">Only For You</p>
             
-            <button onclick="startExperience()" class="group relative px-10 py-4 overflow-hidden border border-zinc-700 hover:border-yellow-500/50 transition-all duration-700 bg-transparent">
-                <!-- Hover effect background -->
+            <button onclick="startExperience()" class="w-full group relative px-6 py-4 overflow-hidden border border-zinc-700 active:border-yellow-500/50 transition-all duration-300 bg-transparent active:scale-95 touch-manipulation">
                 <div class="absolute inset-0 w-0 bg-yellow-900/10 transition-all duration-[250ms] ease-out group-hover:w-full"></div>
                 
-                <span class="relative z-10 font-serif italic text-3xl text-zinc-300 group-hover:text-yellow-400 transition-colors duration-300">
+                <span class="relative z-10 font-serif italic text-2xl md:text-3xl text-zinc-300 group-hover:text-yellow-400 transition-colors duration-300">
                     Open For Brenda
                 </span>
             </button>
@@ -190,69 +162,65 @@
         </div>
     </div>
 
-    <!-- Main Content (Hidden until start) -->
-    <div id="main-content" class="opacity-0 transition-opacity duration-1000 overflow-y-auto h-screen relative scroll-smooth">
+    <!-- Main Content -->
+    <!-- h-dvh fixes mobile browser bar issues -->
+    <div id="main-content" class="opacity-0 transition-opacity duration-1000 overflow-y-auto h-dvh relative scroll-smooth overflow-x-hidden">
         
         <!-- Navigation -->
-        <nav class="fixed top-0 w-full z-[50] px-6 py-6 md:px-10 md:py-8 flex justify-between items-center mix-blend-exclusion">
-            <span class="font-serif italic text-xl md:text-2xl tracking-tight text-white">B // 2026</span>
+        <nav class="fixed top-0 w-full z-[50] px-6 py-6 flex justify-between items-center mix-blend-exclusion pointer-events-none">
+            <span class="font-serif italic text-xl tracking-tight text-white">B // 2026</span>
             <div class="flex items-center gap-4">
-                <span class="text-[9px] uppercase tracking-[0.2em] font-light text-zinc-400 hidden md:block">When We Are Together</span>
                 <div id="status-indicator" class="w-2 h-2 rounded-full bg-zinc-500 transition-colors duration-500"></div>
             </div>
         </nav>
 
         <!-- Hero Section -->
-        <section class="min-h-screen flex flex-col items-center justify-center relative px-6 text-center">
-            <!-- Background Glows -->
+        <section class="min-h-dvh flex flex-col items-center justify-center relative px-6 text-center">
+            <!-- Background Glows (Reduced opacity for mobile) -->
             <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-                <div class="absolute top-1/3 left-1/4 w-96 h-96 bg-rose-500/10 rounded-full blur-[120px] animate-pulse"></div>
-                <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-yellow-500/5 rounded-full blur-[100px]" style="animation-delay: 1s;"></div>
+                <div class="absolute top-1/3 left-1/4 w-64 h-64 bg-rose-500/10 rounded-full blur-[80px] animate-pulse"></div>
+                <div class="absolute bottom-1/4 right-1/4 w-48 h-48 bg-yellow-500/5 rounded-full blur-[60px]" style="animation-delay: 1s;"></div>
             </div>
             
-            <div class="relative z-10 space-y-6">
+            <div class="relative z-10 space-y-4 md:space-y-6 max-w-sm md:max-w-2xl mx-auto">
                 <div class="reveal active transition-delay-300">
-                    <p class="text-xs font-light text-zinc-400 tracking-[0.4em] uppercase mb-4">A Digital Note</p>
-                    <h1 class="font-serif text-5xl md:text-8xl lg:text-9xl leading-[0.9] text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-600">
+                    <p class="text-[10px] md:text-xs font-light text-zinc-400 tracking-[0.3em] uppercase mb-4">A Digital Note</p>
+                    <h1 class="font-serif text-5xl sm:text-7xl md:text-8xl leading-[0.9] text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-600 pb-2">
                         Glad we're <br> <span class="italic text-rose-300 drop-shadow-lg">talking.</span>
                     </h1>
                 </div>
                 
-                <div class="reveal transition-delay-500 max-w-md mx-auto mt-8">
-                    <p class="text-zinc-400 text-sm md:text-base font-light italic leading-relaxed border-l border-zinc-800 pl-6 text-left">
+                <div class="reveal transition-delay-500 max-w-xs mx-auto mt-6">
+                    <p class="text-zinc-400 text-sm font-light italic leading-relaxed border-l border-zinc-800 pl-4 text-left">
                         "I'm not trying to be romantic, but you're just very easy to talk to. There's just something about you."
                     </p>
                 </div>
 
-                <div class="reveal transition-delay-700 pt-12">
-                    <p class="text-[9px] animate-bounce text-zinc-600">SCROLL DOWN</p>
+                <div class="reveal transition-delay-700 pt-16 md:pt-12">
+                    <p class="text-[9px] animate-bounce text-zinc-600 tracking-widest">SCROLL DOWN</p>
                 </div>
             </div>
         </section>
 
         <!-- Player Section -->
-        <section class="py-24 px-4 md:px-6 max-w-5xl mx-auto reveal" id="player-container">
+        <section class="py-16 px-4 md:px-6 max-w-5xl mx-auto reveal" id="player-container">
             <div class="bg-zinc-900/30 backdrop-blur-md border border-white/5 rounded-[2rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group">
-                <!-- Hover Glow -->
-                <div class="absolute inset-0 bg-gradient-to-r from-rose-500/5 to-yellow-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-
+                
                 <div class="flex flex-col md:flex-row items-center gap-8 md:gap-16 relative z-10">
                     <!-- Album Art -->
-                    <div class="relative w-48 h-48 md:w-64 md:h-64 flex-shrink-0">
-                        <!-- Vinyl Record Effect -->
+                    <div class="relative w-48 h-48 flex-shrink-0 mx-auto">
                         <div id="album-art" class="w-full h-full rounded-full border-[1px] border-white/10 overflow-hidden shadow-2xl paused-spin relative">
                             <!-- Vinyl Texture -->
                             <div class="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.1)_10%,transparent_10.5%,transparent_11%,rgba(255,255,255,0.05)_11.5%,transparent_30%)] z-10 pointer-events-none"></div>
-                            <!-- Cover Album: Matty Healy on Car (Part of the Band) -->
-                            <img src="https://i.ytimg.com/vi/87nG3LuabUs/maxresdefault.jpg" class="w-full h-full object-cover opacity-80" alt="Being Funny in a Foreign Language / Part of the Band">
+                            <img src="https://i.ytimg.com/vi/87nG3LuabUs/maxresdefault.jpg" class="w-full h-full object-cover opacity-80" alt="Cover">
                         </div>
                         <!-- Center Hole -->
                         <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
                             <div class="w-6 h-6 bg-[#050505] rounded-full border border-white/20"></div>
                         </div>
-                        <!-- Play Button Overlay -->
-                        <button onclick="toggleSimulation()" id="play-btn" class="absolute inset-0 flex items-center justify-center z-30 group/btn transition-all duration-300">
-                            <span id="play-icon" class="text-3xl text-white drop-shadow-md group-hover/btn:scale-110 transition-transform">▶</span>
+                        <!-- Play Button -->
+                        <button onclick="toggleSimulation()" id="play-btn" class="absolute inset-0 flex items-center justify-center z-30 group/btn transition-all duration-300 active:scale-95">
+                            <span id="play-icon" class="text-3xl text-white drop-shadow-md backdrop-blur-sm bg-black/20 rounded-full w-12 h-12 flex items-center justify-center border border-white/10">▶</span>
                         </button>
                     </div>
 
@@ -260,22 +228,22 @@
                     <div class="flex-1 w-full text-center md:text-left space-y-6">
                         <div>
                             <div class="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 mb-2 justify-center md:justify-start">
-                                <h3 class="text-3xl md:text-4xl font-serif italic text-white leading-tight">When We Are Together</h3>
+                                <h3 class="text-2xl md:text-4xl font-serif italic text-white leading-tight">When We Are Together</h3>
                             </div>
-                            <p class="text-zinc-500 text-xs tracking-widest uppercase mt-2">The 1975 • Being Funny In A Foreign Language</p>
+                            <p class="text-zinc-500 text-[10px] md:text-xs tracking-widest uppercase mt-2">The 1975 • Being Funny In A Foreign Language</p>
                         </div>
 
                         <!-- Dynamic Lyrics Container -->
-                        <div id="lyric-wrapper" class="h-24 flex items-center justify-center md:justify-start">
-                            <div id="lyric-display" class="font-serif italic text-xl md:text-3xl text-zinc-500 leading-tight">
+                        <div id="lyric-wrapper" class="h-20 md:h-24 flex items-center justify-center md:justify-start px-2">
+                            <div id="lyric-display" class="font-serif italic text-lg md:text-3xl text-zinc-500 leading-tight transition-all duration-500">
                                 Tap play...
                             </div>
                         </div>
 
-                        <!-- Progress Bar (Simulated) -->
-                        <div class="space-y-2 group/progress">
-                            <div class="progress-container">
-                                <div class="progress-bar-bg">
+                        <!-- Progress Bar -->
+                        <div class="space-y-2 px-2">
+                            <div class="progress-container cursor-pointer h-4 flex items-center" onclick="seek(event)">
+                                <div class="w-full h-[2px] bg-zinc-800 rounded-full overflow-hidden relative">
                                     <div id="progress-fill" class="progress-fill"></div>
                                 </div>
                             </div>
@@ -290,33 +258,30 @@
         </section>
 
         <!-- Polaroid Gallery -->
-        <section class="py-20 md:py-32 px-6">
-            <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8">
+        <section class="py-20 px-6">
+            <div class="max-w-6xl mx-auto flex flex-col md:grid md:grid-cols-3 gap-16 md:gap-8">
                 
                 <div class="reveal transition-delay-200 group">
-                    <div class="polaroid-frame transform rotate-[-3deg] group-hover:rotate-0 transition-transform duration-500">
+                    <div class="polaroid-frame transform rotate-[-2deg] active:rotate-0 active:scale-100 transition-transform duration-500">
                         <div class="tape opacity-80"></div>
-                        <!-- GANTI URL GAMBAR DI SINI -->
                         <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800" alt="Brenda 1">
-                        <p class="caption">"Small moments."</p>
+                        <p class="caption font-serif italic text-center mt-4 text-zinc-900 text-lg">"Small moments."</p>
                     </div>
                 </div>
 
                 <div class="reveal transition-delay-400 group md:mt-24">
-                    <div class="polaroid-frame transform rotate-[2deg] group-hover:rotate-0 transition-transform duration-500">
+                    <div class="polaroid-frame transform rotate-[1.5deg] active:rotate-0 active:scale-100 transition-transform duration-500">
                         <div class="tape opacity-60" style="transform: translateX(-50%) rotate(-5deg);"></div>
-                        <!-- GANTI URL GAMBAR DI SINI -->
                         <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800" alt="Brenda 2">
-                        <p class="caption">"Your favorite color."</p>
+                        <p class="caption font-serif italic text-center mt-4 text-zinc-900 text-lg">"Your favorite color."</p>
                     </div>
                 </div>
 
                 <div class="reveal transition-delay-600 group">
-                    <div class="polaroid-frame transform rotate-[-1deg] group-hover:rotate-0 transition-transform duration-500">
-                        <div class="tape opacity-90" style="top:-20px"></div>
-                        <!-- GANTI URL GAMBAR DI SINI -->
+                    <div class="polaroid-frame transform rotate-[-1deg] active:rotate-0 active:scale-100 transition-transform duration-500">
+                        <div class="tape opacity-90" style="top:-15px"></div>
                         <img src="https://images.unsplash.com/photo-1621112904887-419379ce6824?q=80&w=800" alt="Brenda 3">
-                        <p class="caption">"Lately."</p>
+                        <p class="caption font-serif italic text-center mt-4 text-zinc-900 text-lg">"Lately."</p>
                     </div>
                 </div>
 
@@ -324,23 +289,22 @@
         </section>
 
         <!-- Letter Section -->
-        <section class="py-32 px-6 flex justify-center reveal">
-            <div class="max-w-2xl w-full text-center space-y-12 relative">
-                <!-- Decorative Quotes -->
-                <span class="absolute -top-10 left-0 text-6xl text-rose-500/10 font-serif">“</span>
+        <section class="py-24 px-6 flex justify-center reveal pb-32">
+            <div class="max-w-xl w-full text-center space-y-10 relative">
+                <span class="absolute -top-10 left-4 text-6xl text-rose-500/10 font-serif">“</span>
                 
                 <div class="space-y-2">
-                    <p class="text-xs font-bold tracking-[0.3em] text-yellow-500/80 uppercase">A Message</p>
-                    <h3 class="font-serif text-5xl md:text-6xl italic text-white">To Brenda,</h3>
+                    <p class="text-[10px] font-bold tracking-[0.3em] text-yellow-500/80 uppercase">A Message</p>
+                    <h3 class="font-serif text-4xl md:text-6xl italic text-white">To Brenda,</h3>
                 </div>
 
-                <div class="space-y-8 text-zinc-300 font-light leading-loose text-lg md:text-xl">
+                <div class="space-y-6 text-zinc-300 font-light leading-loose text-base md:text-xl text-left md:text-center px-2">
                     <p>
-                        Kaya yang lu pernah bilang waktu denger lagu itu <br> 
-                        <span class="text-rose-300 font-serif italic text-2xl">"The only time I feel I might get better is when we are together."</span>
+                        Kaya yang lu pernah bilang waktu denger lagu itu <br class="hidden md:block"> 
+                        <span class="text-rose-300 font-serif italic text-xl md:text-2xl block mt-2">"The only time I feel I might get better is when we are together."</span>
                     </p>
                     <p>
-                        Makasih ya udah nemenin gw selama ini. Jujur, gw suka kalo kita gosip hot topik sampe ngomongin hal random
+                        Makasih ya udah nemenin gw selama ini. Jujur, gw suka kalo kita gosip hot topik sampe ngomongin hal random.
                     </p>
                     <p>
                         You bring a certain <span class="text-yellow-400 font-normal shadow-yellow-500/50 drop-shadow-sm">yellow</span> warmth to my monochrome days.
@@ -348,17 +312,16 @@
                     </p>
                 </div>
 
-                <div class="pt-16 flex flex-col items-center gap-6">
-                    <div class="h-16 w-[1px] bg-gradient-to-b from-white to-transparent"></div>
+                <div class="pt-12 flex flex-col items-center gap-6">
+                    <div class="h-12 w-[1px] bg-gradient-to-b from-white to-transparent"></div>
                     <p class="text-[10px] uppercase tracking-[0.5em] text-zinc-600">From Bryan</p>
                 </div>
             </div>
         </section>
 
         <!-- Footer -->
-        <footer class="pb-10 pt-20 text-center opacity-30 hover:opacity-100 transition-opacity duration-500">
+        <footer class="pb-10 pt-10 text-center opacity-30">
             <p class="text-[9px] tracking-[0.8em] uppercase font-light">Digital Note // February 14</p>
-            <p class="text-[9px] mt-2 font-serif italic text-rose-400">Made for Brenda</p>
         </footer>
     </div>
 
@@ -379,11 +342,9 @@
         // Simulation Variables
         let isPlaying = false;
         let progressInterval;
-        let lyricsInterval;
         let currentTime = 0;
-        const duration = 217; // 3:37 in seconds
+        const duration = 217; // 3:37
 
-        // Lirik yang disinkronkan (Simulasi Waktu)
         const lyrics = [
             { time: 1, text: "..." },
             { time: 5, text: "Our first kiss was Christmas..." },
@@ -407,7 +368,8 @@
                 mainContent.style.opacity = '1';
                 handleScroll();
                 
-                // Auto start simulation
+                // Auto start on mobile might be blocked by browser policy without interaction, 
+                // but we triggered this via button click so it's fine.
                 setTimeout(toggleSimulation, 500);
             }, 1000);
         }
@@ -416,52 +378,45 @@
             isPlaying = !isPlaying;
             
             if (isPlaying) {
-                // UI Playing State
-                playIcon.innerHTML = ""; // Hilangkan icon play
+                playIcon.innerHTML = ""; 
                 playBtn.classList.add('opacity-0'); 
                 playBtn.classList.add('hover:opacity-100');
                 albumArt.classList.remove('paused-spin');
                 albumArt.classList.add('spinning');
                 statusIndicator.classList.remove('bg-zinc-500');
                 statusIndicator.classList.add('bg-green-500');
+                statusIndicator.classList.add('shadow-[0_0_10px_#22c55e]');
                 
-                // Start Timer
                 progressInterval = setInterval(() => {
                     currentTime++;
-                    if (currentTime >= duration) currentTime = 0; // Loop
+                    if (currentTime >= duration) currentTime = 0;
                     updatePlayerUI();
-                }, 1000); // Update tiap detik
+                }, 1000);
                 
             } else {
-                // UI Paused State
                 playIcon.innerHTML = "▶";
                 playBtn.classList.remove('opacity-0');
                 albumArt.classList.add('paused-spin');
                 statusIndicator.classList.add('bg-zinc-500');
                 statusIndicator.classList.remove('bg-green-500');
+                statusIndicator.classList.remove('shadow-[0_0_10px_#22c55e]');
                 
-                // Stop Timer
                 clearInterval(progressInterval);
             }
         }
 
         function updatePlayerUI() {
-            // Update Text Waktu
             const m = Math.floor(currentTime / 60);
             const s = currentTime % 60;
             currentTimeEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
 
-            // Update Progress Bar
             const percent = (currentTime / duration) * 100;
             progressFill.style.width = `${percent}%`;
 
-            // Update Lirik
-            // Cari lirik terakhir yang waktunya <= waktu sekarang
             const currentLyric = [...lyrics].reverse().find(l => l.time <= currentTime);
             
             if (currentLyric) {
                 if (lyricDisplay.innerText !== currentLyric.text) {
-                    // Animasi ganti text
                     lyricDisplay.style.opacity = '0';
                     lyricDisplay.style.transform = 'translateY(5px)';
                     
@@ -470,7 +425,6 @@
                         lyricDisplay.style.opacity = '1';
                         lyricDisplay.style.transform = 'translateY(0)';
                         
-                        // Highlight bagian "Together"
                         if(currentLyric.text.includes("together") || currentLyric.text.includes("better")) {
                             lyricDisplay.classList.add('text-rose-300');
                             lyricDisplay.classList.remove('text-zinc-500');
@@ -485,10 +439,11 @@
             }
         }
 
-        // Scroll Reveal Logic
+        // Scroll Logic for Mobile
         function handleScroll() {
             const reveals = document.querySelectorAll(".reveal");
-            const triggerPoint = window.innerHeight - 100;
+            const triggerPoint = window.innerHeight * 0.85; // Trigger slightly earlier on mobile
+            
             reveals.forEach(reveal => {
                 const top = reveal.getBoundingClientRect().top;
                 if (top < triggerPoint) {
@@ -498,10 +453,11 @@
         }
         mainContent.addEventListener("scroll", handleScroll);
 
-        // Particle System
         function createParticles() {
             const container = document.getElementById('particles');
-            for(let i=0; i<30; i++) {
+            const particleCount = window.innerWidth < 768 ? 15 : 30; // Reduce particles on mobile for performance
+            
+            for(let i=0; i<particleCount; i++) {
                 const p = document.createElement('div');
                 p.classList.add('particle');
                 p.style.width = `${Math.random() * 3 + 1}px`;
