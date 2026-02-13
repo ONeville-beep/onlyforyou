@@ -17,8 +17,8 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-dark);
             color: #fafafa;
-            overflow: hidden; /* Prevent body scroll, handle inside main-content */
-            overscroll-behavior: none; /* Prevent rubber-banding on mobile */
+            overflow: hidden; 
+            overscroll-behavior: none; 
         }
 
         .font-serif { font-family: 'Instrument Serif', serif; }
@@ -47,8 +47,8 @@
             100% { transform:translate(0%, 15%) }
         }
 
-        /* Intro Overlay */
-        #intro-overlay {
+        /* Intro Overlays */
+        #intro-overlay, #captcha-overlay {
             position: fixed;
             inset: 0;
             z-index: 1000;
@@ -60,6 +60,42 @@
             padding: 1rem;
         }
 
+        #captcha-overlay {
+            z-index: 1001;
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .captcha-box {
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 2rem;
+        }
+
+        .color-choice {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease, border 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .color-choice:hover {
+            transform: scale(1.1);
+            border-color: white;
+        }
+
         /* Scroll Animations */
         .reveal { 
             opacity: 0; 
@@ -68,7 +104,7 @@
         }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* Hide Scrollbar for clean mobile look but allow scroll */
+        /* Scrollbar */
         #main-content::-webkit-scrollbar { width: 4px; }
         #main-content::-webkit-scrollbar-track { background: #0a0a0a; }
         #main-content::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
@@ -82,7 +118,7 @@
             position: relative;
             cursor: pointer;
             margin: 0 auto;
-            max-width: 280px; /* Mobile safe width */
+            max-width: 280px;
         }
         .polaroid-frame:hover {
             transform: scale(1.02) rotate(0deg) !important;
@@ -137,7 +173,6 @@
             100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
         }
 
-        /* Mobile Adjustments for viewport height */
         .h-dvh { height: 100vh; height: 100dvh; }
     </style>
 </head>
@@ -148,7 +183,7 @@
         <div class="text-center relative z-10 px-4 w-full max-w-sm mx-auto">
             <p class="text-[9px] uppercase tracking-[0.6em] text-zinc-500 mb-8 animate-pulse">Only For You</p>
             
-            <button onclick="startExperience()" class="w-full group relative px-6 py-4 overflow-hidden border border-zinc-700 active:border-yellow-500/50 transition-all duration-300 bg-transparent active:scale-95 touch-manipulation">
+            <button onclick="showCaptcha()" class="w-full group relative px-6 py-4 overflow-hidden border border-zinc-700 active:border-yellow-500/50 transition-all duration-300 bg-transparent active:scale-95 touch-manipulation">
                 <div class="absolute inset-0 w-0 bg-yellow-900/10 transition-all duration-[250ms] ease-out group-hover:w-full"></div>
                 
                 <span class="relative z-10 font-serif italic text-2xl md:text-3xl text-zinc-300 group-hover:text-yellow-400 transition-colors duration-300">
@@ -162,8 +197,28 @@
         </div>
     </div>
 
+    <!-- Captcha Overlay -->
+    <div id="captcha-overlay">
+        <div id="captcha-box" class="captcha-box text-center">
+            <h2 class="font-serif italic text-3xl text-white mb-2">Verifikasi Identitas</h2>
+            <p class="text-zinc-500 text-sm mb-8">Apa warna favorit Brenda?</p>
+            
+            <div class="color-grid">
+                <div onclick="verify(this)" class="color-choice bg-red-600"></div>
+                <div onclick="verify(this)" class="color-choice bg-blue-600"></div>
+                <div onclick="verify(this)" class="color-choice bg-purple-600"></div>
+                <div onclick="verify(this)" class="color-choice bg-emerald-600"></div>
+                <div onclick="verify(this, true)" class="color-choice bg-yellow-400"></div> <!-- Correct -->
+                <div onclick="verify(this)" class="color-choice bg-orange-600"></div>
+                <div onclick="verify(this)" class="color-choice bg-pink-500"></div>
+                <div onclick="verify(this)" class="color-choice bg-slate-400"></div>
+                <div onclick="verify(this)" class="color-choice bg-white"></div>
+            </div>
+            <p id="error-text" class="text-rose-500 text-[10px] mt-6 opacity-0 uppercase tracking-widest">Salah. Kamu bukan Brenda.</p>
+        </div>
+    </div>
+
     <!-- Main Content -->
-    <!-- h-dvh fixes mobile browser bar issues -->
     <div id="main-content" class="opacity-0 transition-opacity duration-1000 overflow-y-auto h-dvh relative scroll-smooth overflow-x-hidden">
         
         <!-- Navigation -->
@@ -176,7 +231,6 @@
 
         <!-- Hero Section -->
         <section class="min-h-dvh flex flex-col items-center justify-center relative px-6 text-center">
-            <!-- Background Glows (Reduced opacity for mobile) -->
             <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                 <div class="absolute top-1/3 left-1/4 w-64 h-64 bg-rose-500/10 rounded-full blur-[80px] animate-pulse"></div>
                 <div class="absolute bottom-1/4 right-1/4 w-48 h-48 bg-yellow-500/5 rounded-full blur-[60px]" style="animation-delay: 1s;"></div>
@@ -207,24 +261,19 @@
             <div class="bg-zinc-900/30 backdrop-blur-md border border-white/5 rounded-[2rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group">
                 
                 <div class="flex flex-col md:flex-row items-center gap-8 md:gap-16 relative z-10">
-                    <!-- Album Art -->
                     <div class="relative w-48 h-48 flex-shrink-0 mx-auto">
                         <div id="album-art" class="w-full h-full rounded-full border-[1px] border-white/10 overflow-hidden shadow-2xl paused-spin relative">
-                            <!-- Vinyl Texture -->
                             <div class="absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.1)_10%,transparent_10.5%,transparent_11%,rgba(255,255,255,0.05)_11.5%,transparent_30%)] z-10 pointer-events-none"></div>
                             <img src="hq720.jpg" class="w-full h-full object-cover opacity-80" alt="Cover">
                         </div>
-                        <!-- Center Hole -->
                         <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
                             <div class="w-6 h-6 bg-[#050505] rounded-full border border-white/20"></div>
                         </div>
-                        <!-- Play Button -->
                         <button onclick="toggleSimulation()" id="play-btn" class="absolute inset-0 flex items-center justify-center z-30 group/btn transition-all duration-300 active:scale-95">
                             <span id="play-icon" class="text-3xl text-white drop-shadow-md backdrop-blur-sm bg-black/20 rounded-full w-12 h-12 flex items-center justify-center border border-white/10">▶</span>
                         </button>
                     </div>
 
-                    <!-- Controls & Lyrics -->
                     <div class="flex-1 w-full text-center md:text-left space-y-6">
                         <div>
                             <div class="flex flex-col md:flex-row md:items-baseline gap-2 md:gap-4 mb-2 justify-center md:justify-start">
@@ -233,14 +282,12 @@
                             <p class="text-zinc-500 text-[10px] md:text-xs tracking-widest uppercase mt-2">The 1975 • Being Funny In A Foreign Language</p>
                         </div>
 
-                        <!-- Dynamic Lyrics Container -->
                         <div id="lyric-wrapper" class="h-20 md:h-24 flex items-center justify-center md:justify-start px-2">
                             <div id="lyric-display" class="font-serif italic text-lg md:text-3xl text-zinc-500 leading-tight transition-all duration-500">
                                 Tap play...
                             </div>
                         </div>
 
-                        <!-- Progress Bar -->
                         <div class="space-y-2 px-2">
                             <div class="progress-container cursor-pointer h-4 flex items-center" onclick="seek(event)">
                                 <div class="w-full h-[2px] bg-zinc-800 rounded-full overflow-hidden relative">
@@ -326,19 +373,20 @@
         </footer>
     </div>
 
-    <!-- Background Particles Container -->
+    <!-- Background Particles -->
     <div id="particles" class="fixed inset-0 pointer-events-none z-0"></div>
 
-    <!-- AUDIO ELEMENT -->
-    <!-- GANTI BAGIAN INI SAMA FILE LAGU KAMU -->
-    <!-- Contoh: <source src="lagu-romantis.mp3" type="audio/mpeg"> -->
+    <!-- Audio -->
     <audio id="bg-music" loop>
         <source src="The 1975 - When We Are Together.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        const overlay = document.getElementById('intro-overlay');
+        const introOverlay = document.getElementById('intro-overlay');
+        const captchaOverlay = document.getElementById('captcha-overlay');
         const mainContent = document.getElementById('main-content');
+        const errorText = document.getElementById('error-text');
+        const audio = document.getElementById('bg-music');
         const playBtn = document.getElementById('play-btn');
         const playIcon = document.getElementById('play-icon');
         const albumArt = document.getElementById('album-art');
@@ -346,17 +394,40 @@
         const progressFill = document.getElementById('progress-fill');
         const currentTimeEl = document.getElementById('current-time');
         const statusIndicator = document.getElementById('status-indicator');
-        
-        // AMBIL ELEMENT AUDIO
-        const audio = document.getElementById('bg-music');
 
-        // Simulation Variables
+        // Flow logic
+        function showCaptcha() {
+            introOverlay.style.opacity = '0';
+            setTimeout(() => {
+                introOverlay.style.visibility = 'hidden';
+                captchaOverlay.style.visibility = 'visible';
+                captchaOverlay.style.opacity = '1';
+            }, 1000);
+        }
+
+        function verify(element, isCorrect = false) {
+            if (isCorrect) {
+                captchaOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    captchaOverlay.style.visibility = 'hidden';
+                    startExperience();
+                }, 1000);
+            } else {
+                element.style.borderColor = "#f43f5e";
+                errorText.style.opacity = "1";
+                setTimeout(() => {
+                    element.style.borderColor = "transparent";
+                    errorText.style.opacity = "0";
+                }, 1500);
+            }
+        }
+
+        // Main Experience
         let isPlaying = false;
         let progressInterval;
         let currentTime = 0;
-        const duration = 217; // 3:37
+        const duration = 217;
 
-        // LIRIK YANG SUDAH DISINKRONISASI
         const lyrics = [
             { time: 0, text: "..." },
             { time: 13, text: "Our first kiss was Christmas in the Walmart toy department" },
@@ -367,7 +438,6 @@
             { time: 44, text: "It's somethin' 'bout the weather that makes them lie down" },
             { time: 51, text: "The only time I feel I might get better" },
             { time: 58, text: "is when we are together" },
-            { time: 61, text: "..." },
             { time: 78, text: "I like socks with sandals, she's more into scented candles" },
             { time: 83, text: "Oh, I'll never get that smell out of my bag" },
             { time: 90, text: "And it was poorly handled, the day we both got canceled" },
@@ -376,7 +446,6 @@
             { time: 108, text: "It's somethin' 'bout the weather that makes them lie down" },
             { time: 115, text: "The only time I feel I might get better" },
             { time: 122, text: "Is when we are together" },
-            { time: 126, text: "..." },
             { time: 141, text: "\"I'm better at writing\" was just a way to get you biting" },
             { time: 148, text: "Oh, the truth is that our egos are absurd" },
             { time: 154, text: "I thought we were fighting, but it seems I was gaslighting" },
@@ -385,54 +454,36 @@
             { time: 172, text: "Said it's something 'bout the weather that makes them lie down" },
             { time: 180, text: "The only time I feel I might get better" },
             { time: 185, text: "Is when we are together" },
-            { time: 190, text: "..." },
         ];
 
         function startExperience() {
-            overlay.style.opacity = '0';
-            setTimeout(() => {
-                overlay.style.visibility = 'hidden';
-                mainContent.style.opacity = '1';
-                handleScroll();
-                
-                // Audio tidak akan otomatis jalan di HP karena kebijakan browser (harus di klik user dulu)
-                // Jadi user harus klik tombol Play di player music
-            }, 1000);
+            mainContent.style.opacity = '1';
+            handleScroll();
         }
 
         function toggleSimulation() {
             isPlaying = !isPlaying;
-            
             if (isPlaying) {
-                // PLAY AUDIO
                 audio.play();
-
                 playIcon.innerHTML = ""; 
                 playBtn.classList.add('opacity-0'); 
-                playBtn.classList.add('hover:opacity-100');
                 albumArt.classList.remove('paused-spin');
                 albumArt.classList.add('spinning');
-                statusIndicator.classList.remove('bg-zinc-500');
                 statusIndicator.classList.add('bg-green-500');
-                statusIndicator.classList.add('shadow-[0_0_10px_#22c55e]');
+                statusIndicator.classList.remove('bg-zinc-500');
                 
                 progressInterval = setInterval(() => {
                     currentTime++;
                     if (currentTime >= duration) currentTime = 0;
                     updatePlayerUI();
                 }, 1000);
-                
             } else {
-                // PAUSE AUDIO
                 audio.pause();
-
                 playIcon.innerHTML = "▶";
                 playBtn.classList.remove('opacity-0');
                 albumArt.classList.add('paused-spin');
                 statusIndicator.classList.add('bg-zinc-500');
                 statusIndicator.classList.remove('bg-green-500');
-                statusIndicator.classList.remove('shadow-[0_0_10px_#22c55e]');
-                
                 clearInterval(progressInterval);
             }
         }
@@ -441,44 +492,28 @@
             const m = Math.floor(currentTime / 60);
             const s = currentTime % 60;
             currentTimeEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-
             const percent = (currentTime / duration) * 100;
             progressFill.style.width = `${percent}%`;
 
             const currentLyric = [...lyrics].reverse().find(l => l.time <= currentTime);
-            
-            if (currentLyric) {
-                if (lyricDisplay.innerText !== currentLyric.text) {
-                    lyricDisplay.style.opacity = '0';
-                    lyricDisplay.style.transform = 'translateY(5px)';
-                    
-                    setTimeout(() => {
-                        lyricDisplay.innerText = currentLyric.text;
-                        lyricDisplay.style.opacity = '1';
-                        lyricDisplay.style.transform = 'translateY(0)';
-                        
-                        if(currentLyric.text.includes("together") || currentLyric.text.includes("better")) {
-                            lyricDisplay.classList.add('text-rose-300');
-                            lyricDisplay.classList.remove('text-zinc-500');
-                            lyricDisplay.style.textShadow = "0 0 20px rgba(251, 113, 133, 0.5)";
-                        } else {
-                            lyricDisplay.classList.remove('text-rose-300');
-                            lyricDisplay.classList.add('text-zinc-500');
-                            lyricDisplay.style.textShadow = "none";
-                        }
-                    }, 300);
-                }
+            if (currentLyric && lyricDisplay.innerText !== currentLyric.text) {
+                lyricDisplay.style.opacity = '0';
+                setTimeout(() => {
+                    lyricDisplay.innerText = currentLyric.text;
+                    lyricDisplay.style.opacity = '1';
+                    if(currentLyric.text.includes("together")) {
+                        lyricDisplay.classList.add('text-rose-300');
+                    } else {
+                        lyricDisplay.classList.remove('text-rose-300');
+                    }
+                }, 300);
             }
         }
 
-        // Scroll Logic for Mobile
         function handleScroll() {
             const reveals = document.querySelectorAll(".reveal");
-            const triggerPoint = window.innerHeight * 0.85; // Trigger slightly earlier on mobile
-            
             reveals.forEach(reveal => {
-                const top = reveal.getBoundingClientRect().top;
-                if (top < triggerPoint) {
+                if (reveal.getBoundingClientRect().top < window.innerHeight * 0.85) {
                     reveal.classList.add("active");
                 }
             });
@@ -487,9 +522,8 @@
 
         function createParticles() {
             const container = document.getElementById('particles');
-            const particleCount = window.innerWidth < 768 ? 15 : 30; // Reduce particles on mobile for performance
-            
-            for(let i=0; i<particleCount; i++) {
+            const count = window.innerWidth < 768 ? 15 : 30;
+            for(let i=0; i<count; i++) {
                 const p = document.createElement('div');
                 p.classList.add('particle');
                 p.style.width = `${Math.random() * 3 + 1}px`;
@@ -497,13 +531,10 @@
                 p.style.left = `${Math.random() * 100}vw`;
                 p.style.top = `${Math.random() * 100}vh`;
                 p.style.animationDelay = `${Math.random() * 10}s`;
-                p.style.animationDuration = `${Math.random() * 20 + 10}s`;
-                if(Math.random() > 0.9) p.style.background = "#fbbf24";
                 container.appendChild(p);
             }
         }
         createParticles();
-
     </script>
 </body>
-</html>
+    </html>
